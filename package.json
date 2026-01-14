@@ -1,0 +1,46 @@
+{
+  "name": "create-cloudinary-react-vite",
+  "version": "1.0.0-beta.1",
+  "description": "Scaffold a Cloudinary React + Vite + TypeScript project with interactive setup",
+  "type": "module",
+  "bin": {
+    "create-cloudinary-react-vite": "./cli.js"
+  },
+  "keywords": [
+    "cloudinary",
+    "react",
+    "vite",
+    "typescript",
+    "boilerplate",
+    "scaffold"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cloudinary-devs/create-cloudinary-react-vite.git"
+  },
+  "homepage": "https://github.com/cloudinary-devs/create-cloudinary-react-vite#readme",
+  "bugs": {
+    "url": "https://github.com/cloudinary-devs/create-cloudinary-react-vite/issues"
+  },
+  "dependencies": {
+    "inquirer": "^9.2.15",
+    "chalk": "^5.3.0",
+    "fs-extra": "^11.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "prepare": "husky install",
+    "release": "release-please manifest --repo-url=github.com/cloudinary-devs/create-cloudinary-react-vite",
+    "release:pr": "release-please release-pr --repo-url=github.com/cloudinary-devs/create-cloudinary-react-vite"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
+    "husky": "^9.1.7",
+    "release-please": "^16.0.0"
+  }
+}

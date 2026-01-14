@@ -1,0 +1,112 @@
+import { useEffect, useRef } from 'react';
+import { uploadPreset } from './config';
+
+interface UploadWidgetProps {
+  onUploadSuccess?: (result: any) => void;
+  onUploadError?: (error: Error) => void;
+  buttonText?: string;
+  className?: string;
+}
+
+declare global {
+  interface Window {
+    cloudinary: any;
+  }
+}
+
+export function UploadWidget({
+  onUploadSuccess,
+  onUploadError,
+  buttonText = 'Upload Image',
+  className = '',
+}: UploadWidgetProps) {
+  const widgetRef = useRef<any>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    // Load Cloudinary Upload Widget script
+    if (!window.cloudinary) {
+      const script = document.createElement('script');
+      script.src = 'https://upload-widget.cloudinary.com/global/all.js';
+      script.async = true;
+      document.body.appendChild(script);
+
+      script.onload = () => {
+        initializeWidget();
+      };
+    } else {
+      initializeWidget();
+    }
+
+    function initializeWidget() {
+      if (!window.cloudinary || !buttonRef.current) return;
+
+      if (!uploadPreset) {
+        console.warn(
+          'VITE_CLOUDINARY_UPLOAD_PRESET is not set. ' +
+          'Create an unsigned upload preset in your Cloudinary dashboard.'
+        );
+      }
+
+      widgetRef.current = window.cloudinary.createUploadWidget(
+        {
+          cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
+          uploadPreset: uploadPreset || undefined,
+          sources: ['local', 'camera', 'url'],
+          multiple: false,
+        },
+        (error: any, result: any) => {
+          if (error) {
+            console.error('Upload error:', error);
+            onUploadError?.(new Error(error.message || 'Upload failed'));
+            return;
+          }
+
+          if (result && result.event === 'success') {
+            console.log('Upload success:', result.info);
+            onUploadSuccess?.(result.info);
+          }
+        }
+      );
+
+      buttonRef.current.addEventListener('click', () => {
+        widgetRef.current?.open();
+      });
+    }
+
+    return () => {
+      if (buttonRef.current && widgetRef.current) {
+        buttonRef.current.removeEventListener('click', () => {
+          widgetRef.current?.open();
+        });
+      }
+    };
+  }, [onUploadSuccess, onUploadError]);
+
+  return (
+    <button
+      ref={buttonRef}
+      type="button"
+      className={className}
+      style={{
+        padding: '0.75rem 1.5rem',
+        fontSize: '1rem',
+        fontWeight: 500,
+        color: 'white',
+        backgroundColor: '#6366f1',
+        border: 'none',
+        borderRadius: '0.5rem',
+        cursor: 'pointer',
+        transition: 'background-color 0.2s',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = '#4f46e5';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = '#6366f1';
+      }}
+    >
+      {buttonText}
+    </button>
+  );
+}

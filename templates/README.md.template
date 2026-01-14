@@ -1,0 +1,38 @@
+# {{PROJECT_NAME}}
+
+A Cloudinary React + Vite + TypeScript project scaffolded with [create-cloudinary-react-vite](https://github.com/your-org/create-cloudinary-react-vite).
+
+## Quick Start
+
+```bash
+npm run dev
+```
+
+## Environment Variables
+
+Your `.env` file has been pre-configured with:
+- `VITE_CLOUDINARY_CLOUD_NAME`: {{CLOUD_NAME}}
+{{#UPLOAD_PRESET}}
+- `VITE_CLOUDINARY_UPLOAD_PRESET`: {{UPLOAD_PRESET}}
+{{/UPLOAD_PRESET}}
+{{^UPLOAD_PRESET}}
+- `VITE_CLOUDINARY_UPLOAD_PRESET`: (not set - create an unsigned upload preset)
+
+To create an upload preset:
+1. Go to https://cloudinary.com/console/settings/upload/presets
+2. Click "Add upload preset"
+3. Set it to "Unsigned" mode
+4. Add the preset name to your `.env` file
+{{/UPLOAD_PRESET}}
+
+## AI Assistant Support
+
+This project includes AI coding rules for your selected AI assistant(s). The rules help AI assistants understand Cloudinary React SDK patterns, common errors, and best practices.
+
+**Try the AI Prompts**: Check out the "🤖 Try Asking Your AI Assistant" section in the app for ready-to-use Cloudinary prompts to get started!
+
+## Learn More
+
+- [Cloudinary React SDK Docs](https://cloudinary.com/documentation/react_integration)
+- [Vite Documentation](https://vite.dev)
+- [React Documentation](https://react.dev)

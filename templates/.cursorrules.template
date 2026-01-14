@@ -1,0 +1,517 @@
+# Cloudinary React SDK Patterns & Common Errors
+
+## Official Documentation
+- **Transformation Rules**: https://cloudinary.com/documentation/cloudinary_transformation_rules.md
+- **Transformation Reference**: https://cloudinary.com/documentation/transformation_reference
+- **React Image Transformations & Plugins**: https://cloudinary.com/documentation/react_image_transformations#plugins
+- **React Video Transformations**: https://cloudinary.com/documentation/react_video_transformations
+- **Cloudinary Video Player** (standalone player): https://cloudinary.com/documentation/cloudinary_video_player
+- **Video Player React Tutorial**: https://cloudinary.com/documentation/video_player_react_tutorial#banner
+- Always consult the official transformation rules when creating transformations
+- Use only officially supported parameters from the transformation reference
+
+---
+
+# 📋 PATTERNS (How to Do It Right)
+
+## Environment Variables
+- **Vite requires VITE_ prefix** - Environment variables MUST start with `VITE_` to be exposed to the browser
+- ✅ CORRECT: `VITE_CLOUDINARY_CLOUD_NAME=mycloud` in `.env` file
+- ✅ CORRECT: `import.meta.env.VITE_CLOUDINARY_CLOUD_NAME` (not `process.env`)
+- Always restart dev server after adding/updating `.env` variables
+
+## Import Patterns
+- ✅ Import Cloudinary instance: `import { cld } from './cloudinary/config'`
+- ✅ Import components: `import { AdvancedImage, AdvancedVideo } from '@cloudinary/react'`
+- ✅ Import transformations: `import { fill } from '@cloudinary/url-gen/actions/resize'`
+- ✅ Import effects: `import { blur } from '@cloudinary/url-gen/actions/effect'`
+- ✅ Import delivery: `import { format, quality } from '@cloudinary/url-gen/actions/delivery'`
+- ✅ Import qualifiers: `import { auto } from '@cloudinary/url-gen/qualifiers/format'`
+- ✅ Import qualifiers: `import { auto as autoQuality } from '@cloudinary/url-gen/qualifiers/quality'`
+- ✅ Import plugins: `import { responsive, lazyload, placeholder } from '@cloudinary/react'`
+
+## Creating Image & Video Instances
+- ✅ Create image instance: `const img = cld.image(publicId)`
+- ✅ Create video instance: `const video = cld.video(publicId)` (same pattern as images)
+- ✅ Public ID format: Use forward slashes for folders (e.g., `'folder/subfolder/image'`)
+- ✅ Public IDs are case-sensitive and should not include file extensions
+- ✅ Examples:
+  ```tsx
+  const displayImage = cld.image('samples/cloudinary-icon');
+  const displayVideo = cld.video('samples/elephants');
+  ```
+
+## Transformation Patterns
+
+### Image Transformations
+- ✅ Chain transformations on image instance:
+  ```tsx
+  const img = cld.image('id')
+    .resize(fill().width(800).height(600))
+    .effect(blur(800))
+    .delivery(format(auto()))
+    .delivery(quality(autoQuality()));
+  ```
+- ✅ Pass to component: `<AdvancedImage cldImg={img} />`
+
+### Video Transformations
+- ✅ Chain transformations on video instance (same pattern as images):
+  ```tsx
+  const video = cld.video('id')
+    .resize(fill().width(800).height(600))
+    .delivery(format(auto()));
+  ```
+- ✅ Pass to component: `<AdvancedVideo cldVid={video} />`
+- ✅ Video transformations work the same way as image transformations
+
+### Transformation Best Practices
+- ✅ Format and quality must use separate `.delivery()` calls
+- ✅ Always end with auto format/quality: `.delivery(format(auto())).delivery(quality(autoQuality()))`
+- ✅ Use `gravity(auto())` unless user specifies a focal point
+- ✅ Same transformation syntax works for both images and videos
+
+## Plugin Patterns
+- ✅ Import plugins from `@cloudinary/react`
+- ✅ Pass plugins as array: `plugins={[responsive(), lazyload(), placeholder()]}`
+- ✅ Recommended plugin order:
+  1. `responsive()` - First
+  2. `lazyload()` - Second
+  3. `accessibility()` - Third
+  4. `placeholder()` - Last
+- ✅ Always add `width` and `height` attributes to prevent layout shift
+- ✅ Example:
+  ```tsx
+  <AdvancedImage
+    cldImg={img}
+    plugins={[responsive(), lazyload(), placeholder({ mode: 'blur' })]}
+    width={800}
+    height={600}
+  />
+  ```
+
+## Responsive Images Pattern
+- ✅ Use `responsive()` plugin with `fill()` resize
+- ✅ Combine with `placeholder()` and `lazyload()` plugins
+- ✅ Example:
+  ```tsx
+  const img = cld.image('id').resize(fill().width(800));
+  <AdvancedImage 
+    cldImg={img} 
+    plugins={[responsive(), placeholder({ mode: 'blur' }), lazyload()]} 
+    width={800}
+    height={600}
+  />
+  ```
+
+## Upload Widget Pattern
+- ✅ Use component: `import { UploadWidget } from './cloudinary/UploadWidget'`
+- ✅ Load script in `index.html`:
+  ```html
+  <script src="https://upload-widget.cloudinary.com/global/all.js" async></script>
+  ```
+- ✅ Create unsigned upload preset in dashboard at `settings/upload/presets`
+- ✅ Add to `.env`: `VITE_CLOUDINARY_UPLOAD_PRESET=your_preset_name`
+- ✅ Handle callbacks:
+  ```tsx
+  <UploadWidget
+    onUploadSuccess={(result) => {
+      console.log('Public ID:', result.public_id);
+    }}
+    onUploadError={(error) => {
+      console.error('Upload failed:', error);
+    }}
+  />
+  ```
+- ✅ Upload result contains: `public_id`, `secure_url`, `width`, `height`, etc.
+
+## Video Patterns
+
+### ⚠️ IMPORTANT: Two Different Approaches
+
+**1. AdvancedVideo Component** (`@cloudinary/react`) - For video transformations
+- React component similar to `AdvancedImage`
+- Use for displaying videos with Cloudinary transformations
+- Works with `cld.video()` like images work with `cld.image()`
+- Simple, React-friendly approach
+
+**2. Cloudinary Video Player** (`cloudinary-video-player`) - For advanced player features
+- Standalone video player library
+- Use for advanced features: playlists, recommendations, ads, chapters, etc.
+- Full-featured player with analytics, monetization, etc.
+- More complex setup, but more powerful
+
+### AdvancedVideo Component (React SDK - For Transformations)
+- ✅ **Purpose**: Display videos with Cloudinary transformations (resize, effects, etc.)
+- ✅ **Package**: `@cloudinary/react` (same as AdvancedImage)
+- ✅ **Import**: `import { AdvancedVideo } from '@cloudinary/react'`
+- ✅ **NO CSS IMPORT NEEDED**: AdvancedVideo uses native HTML5 video - no CSS import required
+- ❌ **WRONG**: `import '@cloudinary/react/dist/cld-video-player.css'` (this path doesn't exist)
+- ✅ **Create video instance**: `const video = cld.video(publicId)` (like `cld.image()`)
+- ✅ **Apply transformations**: Chain transformations like images:
+  ```tsx
+  const video = cld.video('video-id')
+    .resize(fill().width(800).height(600))
+    .delivery(format(auto()));
+  ```
+- ✅ **Use component**:
+  ```tsx
+  <AdvancedVideo
+    cldVid={video}
+    controls
+    autoplay
+    muted
+  />
+  ```
+- ✅ **Documentation**: https://cloudinary.com/documentation/react_video_transformations
+
+### Cloudinary Video Player (Standalone - For Advanced Features)
+- ✅ **Purpose**: Full-featured video player with playlists, recommendations, ads, etc.
+- ✅ **Package**: `cloudinary-video-player` (separate package)
+- ✅ **Import**: `import cloudinary from 'cloudinary-video-player'`
+- ✅ **Import CSS**: `import 'cloudinary-video-player/dist/cld-video-player.css'`
+- ✅ **Import modules** (for advanced features):
+  ```tsx
+  import 'cloudinary-video-player/dist/adaptive-streaming'; // HLS/DASH
+  import 'cloudinary-video-player/dist/playlist'; // Playlists
+  import 'cloudinary-video-player/dist/recommendations-overlay'; // Recommendations
+  // Or import all: import 'cloudinary-video-player/dist/all'
+  ```
+- ✅ **Initialize in useEffect** with cleanup:
+  ```tsx
+  useEffect(() => {
+    const player = cloudinary.videoPlayer(ref.current, {
+      cloud_name: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
+      secure: true,
+      controls: true,
+    });
+    player.source(publicId);
+    return () => player.dispose(); // Always cleanup!
+  }, [publicId]);
+  ```
+- ✅ **Video element classes**: `className="cld-video-player cld-fluid"`
+- ✅ **Documentation**: https://cloudinary.com/documentation/cloudinary_video_player
+- ✅ **React Tutorial**: https://cloudinary.com/documentation/video_player_react_tutorial#banner
+
+### When to Use Which?
+- ✅ **Use AdvancedVideo** when: You need simple video playback with transformations
+- ✅ **Use Video Player** when: You need playlists, recommendations, ads, chapters, or other advanced features
+
+## TypeScript Patterns
+
+### Type Imports
+- ✅ Import types from `@cloudinary/url-gen`:
+  ```tsx
+  import type { CloudinaryImage } from '@cloudinary/url-gen';
+  import type { CloudinaryVideo } from '@cloudinary/url-gen';
+  ```
+- ✅ Type image instance: `const img: CloudinaryImage = cld.image('id')`
+- ✅ Type video instance: `const video: CloudinaryVideo = cld.video('id')`
+
+### Upload Result Types
+- ✅ Define interface for upload results:
+  ```tsx
+  interface CloudinaryUploadResult {
+    public_id: string;
+    secure_url: string;
+    url: string;
+    width: number;
+    height: number;
+    format: string;
+    resource_type: string;
+    bytes: number;
+    created_at: string;
+    // Add other fields as needed
+  }
+  ```
+- ✅ Type upload callbacks:
+  ```tsx
+  onUploadSuccess?: (result: CloudinaryUploadResult) => void;
+  ```
+- ❌ **WRONG**: `onUploadSuccess?: (result: any) => void`
+- ✅ **CORRECT**: Use proper interface or type definition
+
+### Environment Variable Typing
+- ✅ Create `vite-env.d.ts` for type safety:
+  ```tsx
+  /// <reference types="vite/client" />
+  
+  interface ImportMetaEnv {
+    readonly VITE_CLOUDINARY_CLOUD_NAME: string;
+    readonly VITE_CLOUDINARY_UPLOAD_PRESET?: string;
+  }
+  
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+  ```
+- ✅ Access with type safety: `import.meta.env.VITE_CLOUDINARY_CLOUD_NAME`
+
+### Type Guards and Safety
+- ✅ Type guard for window.cloudinary:
+  ```tsx
+  function isCloudinaryLoaded(): boolean {
+    return typeof window !== 'undefined' && 
+           typeof window.cloudinary !== 'undefined';
+  }
+  ```
+- ✅ Use type guards before accessing:
+  ```tsx
+  if (isCloudinaryLoaded()) {
+    window.cloudinary.createUploadWidget(...);
+  }
+  ```
+
+### Ref Typing Patterns
+- ✅ Type refs properly:
+  ```tsx
+  // Video element ref
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // Button ref
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  
+  // Widget ref (use unknown if types not available)
+  const widgetRef = useRef<unknown>(null);
+  ```
+
+### Type Narrowing
+- ✅ Handle optional values with type narrowing:
+  ```tsx
+  const preset = uploadPreset || undefined; // Type: string | undefined
+  
+  // Type narrowing in conditionals
+  if (uploadPreset) {
+    // TypeScript knows uploadPreset is string here
+    console.log(preset.length);
+  }
+  ```
+
+### Avoid `any` Type
+- ❌ **WRONG**: `const result: any = ...`
+- ✅ **CORRECT**: Use proper interface or `unknown` with type guards
+- ✅ **CORRECT**: `const result: unknown = ...` then narrow with type guards
+- ✅ When types aren't available, use `unknown` and narrow:
+  ```tsx
+  function handleResult(result: unknown) {
+    if (result && typeof result === 'object' && 'public_id' in result) {
+      // TypeScript knows result has public_id
+      const uploadResult = result as CloudinaryUploadResult;
+    }
+  }
+  ```
+
+## Best Practices
+- ✅ Always use `fill()` resize for responsive images
+- ✅ Always end transformations with `.delivery(format(auto())).delivery(quality(autoQuality()))`
+- ✅ Use `placeholder()` and `lazyload()` plugins together
+- ✅ Always add `width` and `height` attributes to `AdvancedImage`
+- ✅ Store `public_id` from upload success, not full URL
+- ✅ Always dispose video player in useEffect cleanup
+- ✅ Use TypeScript for better autocomplete and error catching
+- ✅ Prefer `unknown` over `any` when types aren't available
+- ✅ Use type guards for runtime type checking
+- ✅ Define interfaces for Cloudinary API responses
+- ✅ Create `vite-env.d.ts` for environment variable typing
+- ✅ Use proper HTML element types for refs
+
+---
+
+# ⚠️ COMMON ERRORS & SOLUTIONS
+
+## Environment Variable Errors
+
+### "Cloud name is required"
+- ❌ Problem: `VITE_CLOUDINARY_CLOUD_NAME` not set or wrong prefix
+- ✅ Solution:
+  1. Check `.env` file exists in project root
+  2. Verify variable is `VITE_CLOUDINARY_CLOUD_NAME` (with `VITE_` prefix!)
+  3. Restart dev server after adding .env variables
+
+### "VITE_ prefix required" or env var is undefined
+- ❌ Problem: Variable doesn't have `VITE_` prefix
+- ✅ Solution:
+  1. Rename `CLOUDINARY_CLOUD_NAME` → `VITE_CLOUDINARY_CLOUD_NAME`
+  2. Restart dev server
+  3. Use `import.meta.env.VITE_CLOUDINARY_CLOUD_NAME` (not `process.env`)
+
+## Import Errors
+
+### "Cannot find module" or wrong import
+- ❌ Problem: Importing from wrong package
+- ✅ Solution:
+  - Components: `@cloudinary/react` (not `@cloudinary/url-gen`)
+  - Transformations: `@cloudinary/url-gen/actions/*` (not `@cloudinary/react`)
+  - Cloudinary class: `@cloudinary/url-gen` (not `@cloudinary/react`)
+
+## Transformation Errors
+
+### "Transformation not working" or image looks wrong
+- ❌ Problem: Incorrect transformation syntax
+- ✅ Solution:
+  1. Check transformation is chained: `cld.image('id').resize(...).effect(...)`
+  2. Verify actions are imported from correct modules
+  3. Ensure image public_id is correct and accessible
+  4. Check transformation syntax matches v2 (not v1)
+  5. Format/quality must be separate: `.delivery(format(auto())).delivery(quality(autoQuality()))`
+
+### Wrong transformation syntax
+- ❌ WRONG: `<AdvancedImage src="image.jpg" width={800} />`
+- ✅ CORRECT: 
+  ```tsx
+  const img = cld.image('image.jpg').resize(fill().width(800));
+  <AdvancedImage cldImg={img} />
+  ```
+
+## Plugin Errors
+
+### "Responsive images not working" or "Placeholder issues"
+- ❌ Problem: Plugins not configured correctly
+- ✅ Solution:
+  1. Must use `responsive()` plugin with `fill()` resize
+  2. Include both `placeholder()` and `lazyload()` plugins
+  3. Check image is accessible and public_id is correct
+  4. Verify plugins are in array: `plugins={[responsive(), placeholder(), lazyload()]}`
+  5. Always add `width` and `height` attributes
+
+### Plugins not working
+- ❌ WRONG: `<AdvancedImage cldImg={img} lazyLoad placeholder />`
+- ✅ CORRECT: `<AdvancedImage cldImg={img} plugins={[lazyload(), placeholder()]} />`
+- ✅ Plugins must be imported from `@cloudinary/react`, not `@cloudinary/url-gen`
+
+## Upload Widget Errors
+
+### "Upload preset not found" or "Invalid upload preset"
+- ❌ Problem: Preset doesn't exist or is signed
+- ✅ Solution:
+  1. Create unsigned upload preset in Cloudinary dashboard
+  2. Go to `settings/upload/presets` > Add upload preset
+  3. Set to "Unsigned" mode
+  4. Copy exact preset name to `.env` as `VITE_CLOUDINARY_UPLOAD_PRESET`
+  5. Restart dev server
+
+### "Cannot upload large images" or "Upload fails for large files"
+- ❌ Problem: File too large or script not loaded
+- ✅ Solution:
+  1. Use chunked uploads for files > 20MB
+  2. Check upload preset has appropriate limits in dashboard
+  3. Verify `window.cloudinary` script is loaded in `index.html`
+  4. Consider using server-side upload for very large files
+
+### Widget not opening
+- ❌ Problem: Script not loaded or initialization issue
+- ✅ Solution:
+  1. Ensure script is in `index.html`: `<script src="https://upload-widget.cloudinary.com/global/all.js" async></script>`
+  2. Check widget initializes in `useEffect` after `window.cloudinary` is available
+  3. Verify upload preset is set correctly
+
+## Video Errors
+
+### "AdvancedVideo not working" or "Video not displaying"
+- ❌ Problem: Wrong component or incorrect setup
+- ✅ Solution:
+  1. Verify you're using `AdvancedVideo` from `@cloudinary/react` (not video player)
+  2. Check video instance is created: `const video = cld.video(publicId)`
+  3. **NO CSS IMPORT NEEDED** - AdvancedVideo doesn't require CSS import
+  4. ❌ **WRONG**: `import '@cloudinary/react/dist/cld-video-player.css'` (this path doesn't exist)
+  5. Verify public ID is correct and video exists in Cloudinary
+  6. Check transformations are chained correctly (same as images)
+
+### "Failed to resolve import @cloudinary/react/dist/cld-video-player.css"
+- ❌ Problem: Trying to import CSS that doesn't exist in `@cloudinary/react`
+- ✅ Solution:
+  1. **Remove the CSS import** - AdvancedVideo doesn't need it
+  2. The `cld-video-player.css` file is only for `cloudinary-video-player` package
+  3. AdvancedVideo uses native HTML5 video elements - no CSS required
+  4. If you need styled video player, use `cloudinary-video-player` instead
+
+### "Video player not working" or "Player not initializing"
+- ❌ Problem: Configuration or initialization issue with standalone player
+- ✅ Solution:
+  1. Check `cloud_name` is provided in player config
+  2. Ensure CSS file is imported: `import 'cloudinary-video-player/dist/cld-video-player.css'`
+  3. Verify player is initialized in `useEffect` with proper cleanup
+  4. Check video element has required classes: `cld-video-player cld-fluid`
+  5. Always call `player.dispose()` in useEffect cleanup function
+  6. For advanced features, ensure required modules are imported
+
+### Confusion between AdvancedVideo and Video Player
+- ❌ WRONG: Using `cloudinary-video-player` when you just need transformations
+- ✅ CORRECT: Use `AdvancedVideo` from `@cloudinary/react` for simple video playback with transformations
+- ❌ WRONG: Using `AdvancedVideo` when you need playlists/recommendations/ads
+- ✅ CORRECT: Use `cloudinary-video-player` for advanced features like playlists, recommendations, ads
+
+### Memory leak from video player
+- ❌ WRONG: Not disposing player in cleanup
+- ✅ CORRECT: Always dispose player:
+  ```tsx
+  useEffect(() => {
+    const player = cloudinary.videoPlayer(ref.current, config);
+    return () => player.dispose(); // Always cleanup!
+  }, [dependencies]);
+  ```
+
+## TypeScript Errors
+
+### "TypeScript errors on transformations"
+- ❌ Problem: Missing types or wrong imports
+- ✅ Solution:
+  1. Import types from `@cloudinary/url-gen`
+  2. Use proper action imports: `import { fill } from '@cloudinary/url-gen/actions/resize'`
+  3. Type the image instance if needed: `const img: CloudinaryImage = cld.image('id')`
+  4. Ensure all imports are from correct modules
+
+### "Type 'any' is not assignable" or "Parameter 'result' implicitly has 'any' type"
+- ❌ Problem: Using `any` type or missing type definitions
+- ✅ Solution:
+  1. Define interface for upload results: `interface CloudinaryUploadResult { ... }`
+  2. Type callbacks: `onUploadSuccess?: (result: CloudinaryUploadResult) => void`
+  3. Use `unknown` instead of `any` when types aren't available
+  4. Add type guards to narrow `unknown` types
+
+### "Property 'cloudinary' does not exist on type 'Window'"
+- ❌ Problem: Missing type declaration for window.cloudinary
+- ✅ Solution:
+  ```tsx
+  declare global {
+    interface Window {
+      cloudinary?: {
+        createUploadWidget: (config: any, callback: any) => any;
+      };
+    }
+  }
+  ```
+- ✅ Or use type guard: `if (typeof window.cloudinary !== 'undefined')`
+
+### "Property 'VITE_CLOUDINARY_CLOUD_NAME' does not exist on type 'ImportMetaEnv'"
+- ❌ Problem: Missing type definitions for Vite environment variables
+- ✅ Solution:
+  1. Create `vite-env.d.ts` file
+  2. Add interface: `interface ImportMetaEnv { readonly VITE_CLOUDINARY_CLOUD_NAME: string; }`
+  3. Reference Vite types: `/// <reference types="vite/client" />`
+
+### "Type 'null' is not assignable to type 'RefObject'"
+- ❌ Problem: Incorrect ref typing
+- ✅ Solution:
+  1. Use proper HTML element type: `useRef<HTMLVideoElement>(null)`
+  2. Use `unknown` for widget refs if types aren't available: `useRef<unknown>(null)`
+  3. Check for null before accessing: `if (ref.current) { ... }`
+
+---
+
+## Quick Reference Checklist
+
+When something isn't working, check:
+- [ ] Environment variables have `VITE_` prefix
+- [ ] Dev server was restarted after .env changes
+- [ ] Imports are from correct packages
+- [ ] Transformations are chained on image instance
+- [ ] Format/quality use separate `.delivery()` calls
+- [ ] Plugins are in array format
+- [ ] Upload widget script is loaded in `index.html`
+- [ ] Upload preset is unsigned
+- [ ] Video player is disposed in cleanup
+- [ ] CSS files are imported for video player
+- [ ] TypeScript types are properly imported
+- [ ] Upload result types are defined (not using `any`)
+- [ ] Environment variables are typed in `vite-env.d.ts`
+- [ ] Refs are properly typed with HTML element types
