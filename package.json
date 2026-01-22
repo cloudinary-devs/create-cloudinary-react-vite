@@ -1,6 +1,6 @@
 {
   "name": "create-cloudinary-react",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.1",
   "description": "Scaffold a Cloudinary React + Vite + TypeScript project with interactive setup",
   "type": "module",
   "bin": {
@@ -33,13 +33,14 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "release": "release-please manifest --repo-url=github.com/cloudinary-devs/create-cloudinary-react",
-    "release:pr": "release-please release-pr --repo-url=github.com/cloudinary-devs/create-cloudinary-react"
+    "semantic-release": "semantic-release"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.6.0",
     "@commitlint/config-conventional": "^19.6.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
     "husky": "^9.1.7",
-    "release-please": "^16.0.0"
+    "semantic-release": "^23.0.0"
   }
 }
