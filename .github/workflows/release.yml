@@ -9,6 +9,9 @@ permissions:
   issues: write
   pull-requests: write
 
+# Allow GitHub Actions to bypass branch protection
+# This is required for semantic-release to push version updates
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -47,9 +50,18 @@ jobs:
 
       - name: Setup git branch
         run: |
-          git fetch --all --tags
+          git fetch --all --tags --force
           git checkout -B main
           git branch --set-upstream-to=origin/main main
+          
+          # Show all tags for debugging
+          echo "=== All git tags ==="
+          git tag -l
+          echo ""
+          
+          # Show current package.json version
+          echo "=== Current package.json version ==="
+          node -p "require('./package.json').version"
 
       - name: Debug branch info
         run: |
