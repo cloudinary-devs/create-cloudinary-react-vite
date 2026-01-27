@@ -1,3 +1,10 @@
+# [1.0.0-beta.6](https://github.com/cloudinary-devs/create-cloudinary-react/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2026-01-27)
+
+
+### Bug Fixes
+
+* use npm 11+ in publish step for OIDC trusted publishing ([a501a0a](https://github.com/cloudinary-devs/create-cloudinary-react/commit/a501a0a4d34397b45eda63a7e622792f7e1095ac))
+
 # [1.0.0-beta.5](https://github.com/cloudinary-devs/create-cloudinary-react/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2026-01-27)
 
 
