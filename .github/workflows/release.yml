@@ -113,6 +113,18 @@ jobs:
           echo "To perform a real release, run again and uncheck 'Dry run only'."
           echo ""
 
+      - name: Ensure v1.0.0-beta.1 exists locally (dry run only)
+        if: github.event.inputs.dry_run == 'true'
+        run: |
+          if ! git rev-parse --verify "v1.0.0-beta.1" >/dev/null 2>&1; then
+            # So semantic-release sees a "previous release" and suggests 1.0.0-beta.2 for new commits
+            PARENT=$(git rev-parse HEAD~1 2>/dev/null || git rev-parse HEAD)
+            git tag -a "v1.0.0-beta.1" "$PARENT" -m "chore: initial beta release (dry-run placeholder)"
+            echo "Created local tag v1.0.0-beta.1 at $PARENT so semantic-release can compute next version (1.0.0-beta.2)."
+          else
+            echo "Tag v1.0.0-beta.1 already exists."
+          fi
+
       - name: Debug semantic-release config
         run: |
           echo "=== .releaserc.json ==="
@@ -141,7 +153,9 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
             echo "Running semantic-release in DRY RUN mode..."
-            npx semantic-release --dry-run
+            npx semantic-release --dry-run 2>&1 | tee semantic-release.log || true
+            # Extract "The next release version is X" for use in summary step
+            grep -oE "The next release version is [^[:space:]]+" semantic-release.log 2>/dev/null | sed 's/The next release version is //' > next-version.txt || echo "" > next-version.txt
           else
             echo "Running semantic-release (REAL release)..."
             npx semantic-release
@@ -184,5 +198,12 @@ jobs:
           echo "=============================================="
           echo "  DRY RUN - Skipping npm publish"
           echo "=============================================="
-          echo "Version that WOULD have been published: $(node -p "require('./package.json').version")"
+          NEXT_VERSION=$(cat next-version.txt 2>/dev/null || echo "")
+          if [ -n "$NEXT_VERSION" ]; then
+            echo "Version that WOULD have been published: $NEXT_VERSION"
+          else
+            echo "Version that WOULD have been published: (check semantic-release output above; might be no new release)"
+            echo "Current package.json: $(node -p "require('./package.json').version")"
+          fi
+          echo ""
           echo "To publish for real, run the workflow again with 'Dry run only' unchecked."
