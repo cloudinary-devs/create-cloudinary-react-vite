@@ -1,3 +1,10 @@
+# [1.0.0-beta.2](https://github.com/cloudinary-devs/create-cloudinary-react/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2026-01-27)
+
+
+### Bug Fixes
+
+* clarify release workflow in README ([de81bee](https://github.com/cloudinary-devs/create-cloudinary-react/commit/de81bee417ce1032aa297dd94c366d26ec9beead))
+
 # 1.0.0-beta.1 (2026-01-27)
 
 
