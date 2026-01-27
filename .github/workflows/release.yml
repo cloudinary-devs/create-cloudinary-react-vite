@@ -95,23 +95,6 @@ jobs:
           git notes --ref semantic-release-v1.0.0-beta.1 add -f -m '{"channels":["beta"]}' v1.0.0-beta.1
           echo "Added semantic-release note to v1.0.0-beta.1 (local only for dry run)."
 
-      # One-time fix: v1.0.0-beta.1 existed before semantic-release (manual publish).
-      # It has no channel note, so semantic-release ignores it and tries to create the tag again → "tag already exists".
-      # Fix: delete the broken tag so semantic-release can create it properly (with note). After this run, remove this step.
-      - name: Remove broken v1.0.0-beta.1 tag so semantic-release can create it (one-time)
-        if: github.event.inputs.dry_run != 'true'
-        run: |
-          set -e
-          if git rev-parse --verify "v1.0.0-beta.1" >/dev/null 2>&1; then
-            echo "Removing existing v1.0.0-beta.1 (no channel note); semantic-release will recreate it with note."
-            git tag -d v1.0.0-beta.1 2>/dev/null || true
-            git push origin ":refs/tags/v1.0.0-beta.1" || true
-            git push origin ":refs/notes/semantic-release-v1.0.0-beta.1" 2>/dev/null || true
-            echo "Done. semantic-release will create v1.0.0-beta.1 from scratch."
-          else
-            echo "Tag v1.0.0-beta.1 does not exist; semantic-release will create it."
-          fi
-
       - name: Dry run mode notice
         if: github.event.inputs.dry_run == 'true'
         run: |
@@ -152,7 +135,6 @@ jobs:
             npx semantic-release --dry-run 2>&1 | tee semantic-release.log || true
             grep -oE "The next release version is [^[:space:]]+" semantic-release.log 2>/dev/null | sed 's/The next release version is //' > next-version.txt || echo "" > next-version.txt
           else
-            # Tag + note are prepared in "Prepare v1.0.0-beta.1 for semantic-release" step
             npx semantic-release
           fi
 
