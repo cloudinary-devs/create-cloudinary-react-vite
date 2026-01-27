@@ -144,13 +144,23 @@ jobs:
               fi
             fi
             
-            if [ -n "$NPM_TOKEN" ] && [ "$NPM_TOKEN" != "\${NODE_AUTH_TOKEN}" ]; then
+            # Clean up the token (remove any whitespace, newlines, etc.)
+            NPM_TOKEN=$(echo "$NPM_TOKEN" | tr -d '\n\r\t ' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            
+            if [ -n "$NPM_TOKEN" ] && [ "$NPM_TOKEN" != "\${NODE_AUTH_TOKEN}" ] && [ ${#NPM_TOKEN} -gt 10 ]; then
               echo "::add-mask::$NPM_TOKEN"
               echo "NPM_TOKEN=$NPM_TOKEN" >> $GITHUB_ENV
               echo "✓ NPM_TOKEN extracted and set (length: ${#NPM_TOKEN} chars)"
+              
+              # Also ensure .npmrc is properly formatted for npm
+              echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+              echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
+              echo "always-auth=true" >> ~/.npmrc
+              echo "✓ Recreated .npmrc with proper format"
             else
               echo "✗ Error: Could not extract valid token from .npmrc"
-              echo "Token value: '$NPM_TOKEN'"
+              echo "Token length: ${#NPM_TOKEN} chars"
+              echo "Token preview (first 10 chars): ${NPM_TOKEN:0:10}..."
               echo ""
               echo "Full .npmrc content (first 10 lines, tokens masked):"
               head -10 ~/.npmrc | sed 's/=.*/=***/' || true
