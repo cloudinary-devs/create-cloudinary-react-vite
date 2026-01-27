@@ -60,22 +60,6 @@ jobs:
           git fetch --all --tags --force
           git checkout -B main
           git branch --set-upstream-to=origin/main main
-          
-          # Show all tags for debugging
-          echo "=== All git tags ==="
-          git tag -l
-          echo ""
-          
-          # Show current package.json version
-          echo "=== Current package.json version ==="
-          node -p "require('./package.json').version"
-
-      - name: Debug branch info
-        run: |
-          echo "Current branch: $(git branch --show-current)"
-          echo "All branches: $(git branch -a)"
-          echo "Git remote: $(git remote -v)"
-          echo "Git status: $(git status)"
 
       - uses: actions/setup-node@v4
         with:
@@ -124,20 +108,6 @@ jobs:
           else
             echo "Tag v1.0.0-beta.1 already exists."
           fi
-
-      - name: Debug semantic-release config
-        run: |
-          echo "=== .releaserc.json ==="
-          cat .releaserc.json
-          echo ""
-          echo "=== Git branches ==="
-          git branch -a
-          echo ""
-          echo "=== Current branch ==="
-          git branch --show-current
-          echo ""
-          echo "=== Git tags ==="
-          git tag
 
       - name: Get version before semantic-release
         id: version-before
