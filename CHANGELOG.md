@@ -1,3 +1,10 @@
+# [1.0.0-beta.9](https://github.com/cloudinary-devs/create-cloudinary-react/compare/v1.0.0-beta.8...v1.0.0-beta.9) (2026-01-29)
+
+
+### Bug Fixes
+
+* **rules:** video player CSS import — use path without dist/ ([f749f08](https://github.com/cloudinary-devs/create-cloudinary-react/commit/f749f08ef79e365aba1a992a362ca6a0fb42bbe1))
+
 # [1.0.0-beta.8](https://github.com/cloudinary-devs/create-cloudinary-react/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2026-01-28)
 
 
