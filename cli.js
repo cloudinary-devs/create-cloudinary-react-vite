@@ -74,7 +74,9 @@ async function main() {
       default: false,
       description: chalk.gray(
         'Upload presets enable client-side uploads. You can set one up later at:\n' +
-        'https://console.cloudinary.com/app/settings/upload/presets'
+        'https://console.cloudinary.com/app/settings/upload/presets\n\n' +
+        'The creation and management of upload presets is documented here:\n' +
+        'https://cloudinary.com/documentation/upload_presets#creating_and_managing_upload_presets'
       ),
     },
     {
