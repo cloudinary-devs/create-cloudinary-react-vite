@@ -718,7 +718,7 @@ Docs: https://cloudinary.com/documentation/cloudinary_video_player
 
 ### Cloudinary package install fails or "version doesn't exist"
 - ❌ Problem: Agent pinned a Cloudinary package to a specific version (e.g. `cloudinary-video-player@1.2.3`) that doesn't exist on npm, or used a wrong package name.
-- ✅ **Install latest**: Use `npm install <package>` with **no version** so npm gets the latest compatible. In package.json use a **caret** (e.g. `"cloudinary-video-player": "^1.0.0"`). Use only correct package names: `@cloudinary/react`, `@cloudinary/url-gen`, `cloudinary-video-player`, `cloudinary`. See PATTERNS → "Installing Cloudinary packages".
+- ✅ **Install latest**: Use `npm install <package>` with **no version** so npm gets the latest compatible. In package.json use a **caret** (e.g. `"cloudinary-video-player": "^1.0.0"`). Use only correct package names: `@cloudinary/react`, `@cloudinary/tps://console.cloudinary.com/app/settings/upload/presets\n\n'-gen`, `cloudinary-video-player`, `cloudinary`. See PATTERNS → "Installing Cloudinary packages".
 
 ### Confusion between AdvancedVideo and Video Player
 - **AdvancedVideo** = for **displaying** a video (not a full player). **Cloudinary Video Player** = the **player** (styled UI, controls, playlists, etc.).

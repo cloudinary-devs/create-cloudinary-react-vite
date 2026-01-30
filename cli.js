@@ -49,10 +49,9 @@ async function main() {
     {
       type: 'input',
       name: 'cloudName',
-      message: 'Cloudinary Cloud Name:',
-      description: chalk.gray(
-        'Your cloud name is shown in your dashboard: https://console.cloudinary.com/app/home/dashboard'
-      ),
+      message:
+        'Cloudinary Cloud Name:\n' +
+        chalk.gray('Dashboard: https://console.cloudinary.com/app/home/dashboard'),
       validate: (input) => {
         if (!input.trim()) {
           return chalk.yellow(
@@ -70,14 +69,10 @@ async function main() {
     {
       type: 'confirm',
       name: 'hasUploadPreset',
-      message: 'Do you have an unsigned upload preset? (Required for uploads, optional for transformations)',
+      message:
+        'Do you have an unsigned upload preset? (Required for uploads, optional for transformations)\n' +
+        chalk.gray('Create one: https://console.cloudinary.com/app/settings/upload/presets'),
       default: false,
-      description: chalk.gray(
-        'Upload presets enable client-side uploads. You can set one up later at:\n' +
-        'https://console.cloudinary.com/app/settings/upload/presets\n\n' +
-        'The creation and management of upload presets is documented here:\n' +
-        'https://cloudinary.com/documentation/upload_presets#creating_and_managing_upload_presets'
-      ),
     },
     {
       type: 'input',
