@@ -1,3 +1,15 @@
+# [1.0.0-beta.10](https://github.com/cloudinary-devs/create-cloudinary-react/compare/v1.0.0-beta.9...v1.0.0-beta.10) (2026-01-30)
+
+
+### Bug Fixes
+
+* **cli:** show prompt help in message, one line per prompt ([83b8927](https://github.com/cloudinary-devs/create-cloudinary-react/commit/83b8927caee8649cc77457e17951237d96cf5637))
+
+
+### Features
+
+* Add unsigned uploads documentation link ([c13ebc5](https://github.com/cloudinary-devs/create-cloudinary-react/commit/c13ebc5e93e0c343e5540bfd053db794af7305ec))
+
 # [1.0.0-beta.9](https://github.com/cloudinary-devs/create-cloudinary-react/compare/v1.0.0-beta.8...v1.0.0-beta.9) (2026-01-29)
 
 
