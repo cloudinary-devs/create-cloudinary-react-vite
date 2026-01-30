@@ -55,13 +55,13 @@ export const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || '';
 - **Signed uploads**: Do not use only `uploadPreset`; use the pattern under "Secure (Signed) Uploads" (uploadSignature as function, fetch api_key, server includes upload_preset in signature).
 
 **4. Video player**  
-- Use `cloudName` from `import.meta.env.VITE_CLOUDINARY_CLOUD_NAME` in player config. Validate it before init (e.g. if !cloudName, set error state). See "Cloudinary Video Player (The Player)" for full pattern (named import `videoPlayer`, `player.source({ publicId })`, refs, cleanup).
+- Use imperative video element only (create with document.createElement, append to container ref, pass to videoPlayer). See "Cloudinary Video Player (The Player)" for the full pattern.
 
 **5. Summary for rules-only users**  
 - **Env**: Use your bundler's client env prefix and access (Vite: `VITE_` + `import.meta.env.VITE_*`; see "Other bundlers" if not Vite).
 - **Reusable instance**: One config file that creates and exports `cld` (and optionally `uploadPreset`) from `@cloudinary/url-gen`; use it everywhere.
 - **Upload widget**: Script in index.html (or equivalent); create widget once in useEffect with ref; unsigned = cloudName + uploadPreset; signed = use uploadSignature function and backend.
-- **Video player**: Named import `videoPlayer`, source object, refs, dispose in cleanup.
+- **Video player**: Imperative video element (createElement, append to container ref, pass to videoPlayer); dispose + removeChild in cleanup; fall back to AdvancedVideo if init fails.
 
 **If the user is not using Vite:** Use their bundler's client env prefix and access in the config file and everywhere you read env. Examples: Create React App → `REACT_APP_CLOUDINARY_CLOUD_NAME`, `process.env.REACT_APP_CLOUDINARY_CLOUD_NAME`; Next.js (client) → `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`. The rest (cld instance, widget options, video player) is the same.
 
@@ -88,6 +88,12 @@ export const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || '';
   2. Does the preset exist in the dashboard under Settings → Upload → Upload presets?
   3. Is the preset set to **Unsigned** (not Signed)?
   4. Was the dev server restarted after adding/updating `.env`?
+
+## Installing Cloudinary packages
+- ✅ **Install the latest**: When adding Cloudinary packages, use `npm install <package>` **with no version** so npm installs the latest compatible version (e.g. `npm install cloudinary-video-player`). In package.json use a **caret range** (e.g. `"cloudinary-video-player": "^1.0.0"`) so future installs get the latest compatible. Do not pin to an exact version unless you have verified it exists on npm.
+- ✅ **Package names only**: Use **only** these names: `@cloudinary/react`, `@cloudinary/url-gen`, `cloudinary-video-player` (standalone player), `cloudinary` (Node server-side only). Do not invent names (e.g. no `@cloudinary/video-player`).
+- ❌ **WRONG**: `npm install cloudinary-video-player@1.2.3` or `"cloudinary-video-player": "1.2.3"` (exact pin) — versions may not exist and break installs.
+- ✅ **Correct**: `npm install cloudinary-video-player` (no version) or in package.json: `"cloudinary-video-player": "^1.0.0"` (caret = latest compatible).
 
 ## Import Patterns
 - ✅ Import Cloudinary instance: `import { cld } from './cloudinary/config'`
@@ -369,9 +375,8 @@ res.json({ signature, timestamp: paramsToSign.timestamp, api_key: process.env.CL
 - Use when: user wants to show/display a video. Works with `cld.video()` like images with `cld.image()`
 
 **2. Cloudinary Video Player** (`cloudinary-video-player`) — The **player**
-- Full-featured video player (styled UI, controls, playlists, recommendations, ads, chapters)
-- Use when: user asks for a "video player" or needs player features (playlists, ads, etc.)
-- Separate package; requires CSS and useEffect with `player.dispose()` cleanup
+- Full-featured video player (styled UI, controls, playlists). Use when the user asks for a "video player."
+- **Use imperative video element only** (create with document.createElement, append to container ref); do not pass a React-managed `<video ref>`. See "Cloudinary Video Player (The Player)" below.
 
 ### AdvancedVideo (React SDK - For Displaying a Video)
 - ✅ **Purpose**: Display a video with Cloudinary transformations (resize, effects, etc.). It is **not** a full player — it is for showing a video. For a player, use Cloudinary Video Player.
@@ -398,44 +403,41 @@ res.json({ signature, timestamp: paramsToSign.timestamp, api_key: process.env.CL
 - ✅ **Documentation**: https://cloudinary.com/documentation/react_video_transformations
 
 ### Cloudinary Video Player (The Player)
-- ✅ **Purpose**: The actual video player — full-featured UI, controls, playlists, recommendations, ads, chapters. Use when the user asks for a "video player"; use AdvancedVideo when they just need to display a video.
-- ✅ **Package**: `cloudinary-video-player` (separate package)
-- ✅ **Import** (named, not default): `import { videoPlayer } from 'cloudinary-video-player'` and `import 'cloudinary-video-player/cld-video-player.min.css'`. **Do not use `dist/` in the CSS path** — use `cloudinary-video-player/cld-video-player.min.css` only.
-- ❌ **WRONG**: `import cloudinary from 'cloudinary-video-player'` then `cloudinary.videoPlayer(...)` — use named `videoPlayer` instead.
-- ✅ **player.source()** takes an **object**, not a string: `player.source({ publicId: 'samples/elephants' })`. ❌ WRONG: `player.source('samples/elephants')`.
-- ✅ **Use refs**, not IDs: `const videoRef = useRef<HTMLVideoElement>(null)`; pass `videoRef.current` to `videoPlayer()`. Avoid `document.getElementById` with React (can cause DOM conflicts).
-- ✅ **Store player in a ref**, not state: `const playerRef = useRef<ReturnType<typeof videoPlayer> | null>(null)`.
-- ✅ **Race condition (ref/DOM)**: useEffect runs right after render; at that moment `videoRef.current` may still be **null** (ref not attached yet) or the element may not be in the DOM. **Wait until** `videoRef.current` is set and ready before calling `videoPlayer(videoRef.current, ...)`. Options: (1) small delay (e.g. `setTimeout(..., 0)` or 50ms) then check `videoRef.current`; (2) `useLayoutEffect` so ref is committed before running; (3) poll until `videoRef.current?.isConnected`. Otherwise: "Invalid target for null#on; must be a DOM node or evented object".
-- ✅ **Initialize in useEffect** (or useLayoutEffect) with cleanup; **always dispose** in cleanup (wrap in try-catch so disposal errors don't throw).
-- ✅ **Validate env** before init: if `!import.meta.env.VITE_CLOUDINARY_CLOUD_NAME`, set error state and return early.
-- ✅ **Config**: `videoPlayer(element, { cloudName, secure: true, controls: true, fluid: true })`.
-- ✅ **Example** (refs, source object, wait for ref/DOM, cleanup with try-catch):
-  ```tsx
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const playerRef = useRef<ReturnType<typeof videoPlayer> | null>(null);
-  useEffect(() => {
-    if (!cloudName) return;
-    // Wait for ref to be attached and element in DOM (avoids "Invalid target for null#on")
-    const timeoutId = setTimeout(() => {
-      if (!videoRef.current) return;
-      try {
-        const player = videoPlayer(videoRef.current, { cloudName, secure: true, controls: true, fluid: true });
-        player.source({ publicId: 'samples/elephants' }); // object, not string
-        playerRef.current = player;
-      } catch (err) { console.error(err); }
-    }, 0);
-    return () => {
-      clearTimeout(timeoutId);
-      if (playerRef.current) {
-        try { playerRef.current.dispose(); } catch (e) { console.warn(e); }
-        playerRef.current = null;
-      }
-    };
-  }, [cloudName]);
-  return <video ref={videoRef} className="cld-video-player cld-fluid" />;
-  ```
-- ✅ **Documentation**: https://cloudinary.com/documentation/cloudinary_video_player
-- ✅ **React Tutorial**: https://cloudinary.com/documentation/video_player_react_tutorial#banner
+Use when the user asks for a **video player** (styled UI, controls, playlists). For just **displaying** a video, use AdvancedVideo instead.
+
+**Rule: imperative element only.** Do **not** pass a React-managed `<video ref={...} />` to the player — the library mutates the DOM and React will throw removeChild errors. Create the video element with `document.createElement('video')`, append it to a container ref, and pass that element to `videoPlayer(el, ...)`.
+
+- **Package**: `cloudinary-video-player`. Install with `npm install cloudinary-video-player` (no version).
+- **Import**: `import { videoPlayer } from 'cloudinary-video-player'` (named) and `import 'cloudinary-video-player/cld-video-player.min.css'` (no `dist/` in path).
+- **player.source()** takes an **object**: `player.source({ publicId: 'samples/elephants' })`. Not a string.
+- **Cleanup**: Call `player.dispose()`, then **only if** `el.parentNode` exists call `el.parentNode.removeChild(el)` (avoids NotFoundError).
+- **If init fails** (CSP, extensions, timing): render **AdvancedVideo** with the same publicId. Do not relax CSP in index.html or ask the user to disable extensions.
+
+**Example (copy this pattern):**
+```tsx
+const containerRef = useRef<HTMLDivElement>(null);
+const playerRef = useRef<ReturnType<typeof videoPlayer> | null>(null);
+useLayoutEffect(() => {
+  if (!cloudName || !containerRef.current?.isConnected) return;
+  const el = document.createElement('video');
+  el.className = 'cld-video-player cld-fluid';
+  containerRef.current.appendChild(el);
+  try {
+    const player = videoPlayer(el, { cloudName, secure: true, controls: true, fluid: true });
+    player.source({ publicId: 'samples/elephants' });
+    playerRef.current = player;
+  } catch (err) { console.error(err); }
+  return () => {
+    if (playerRef.current) {
+      try { playerRef.current.dispose(); } catch (e) { console.warn(e); }
+      playerRef.current = null;
+    }
+    if (el.parentNode) el.parentNode.removeChild(el);
+  };
+}, [cloudName]);
+return <div ref={containerRef} />;
+```
+Docs: https://cloudinary.com/documentation/cloudinary_video_player
 
 ### When to Use Which?
 - ✅ **Use AdvancedVideo** when: User wants to **display** or **show** a video (no full player). It just displays a video with transformations.
@@ -551,7 +553,7 @@ res.json({ signature, timestamp: paramsToSign.timestamp, api_key: process.env.CL
 - ✅ Use `placeholder()` and `lazyload()` plugins together
 - ✅ Always add `width` and `height` attributes to `AdvancedImage`
 - ✅ Store `public_id` from upload success, not full URL
-- ✅ Always dispose video player in useEffect cleanup
+- ✅ Video player: use imperative element only; dispose in useLayoutEffect cleanup and remove element with `if (el.parentNode) el.parentNode.removeChild(el)`
 - ✅ Use TypeScript for better autocomplete and error catching
 - ✅ Prefer `unknown` over `any` when types aren't available
 - ✅ Use type guards for runtime type checking
@@ -665,10 +667,15 @@ res.json({ signature, timestamp: paramsToSign.timestamp, api_key: process.env.CL
 - ✅ **Wait for script**: Before calling `window.cloudinary.createUploadWidget(...)`, ensure `typeof window.cloudinary?.createUploadWidget === 'function'`. If not ready, poll (e.g. setInterval until it exists) or inject the script in code and call createUploadWidget in the script's `onload`. Don't assume `window.cloudinary` means the API is ready.
 - ✅ See PATTERNS → Upload Widget Pattern ("Race condition") and Project setup → Upload Widget ("Wait for script").
 
-### Video player: "Invalid target for null#on; must be a DOM node or evented object"
-- ❌ Problem: **Race condition** — useEffect runs right after render; at that moment `videoRef.current` may still be **null** (ref not attached) or the element may not be in the DOM. The player library requires a real DOM node.
-- ✅ **Wait for ref/DOM**: Before calling `videoPlayer(videoRef.current, ...)`, ensure `videoRef.current` is set. Use a short delay (e.g. `setTimeout(..., 0)` or 50ms) then check `videoRef.current`, or use `useLayoutEffect`, or poll until `videoRef.current?.isConnected`. Clean up the timeout in useEffect cleanup.
-- ✅ See PATTERNS → Cloudinary Video Player ("Race condition (ref/DOM)") and the example with `setTimeout(..., 0)`.
+### Video player: "Invalid target for null#on" or React removeChild or NotFoundError
+- ❌ Problem: Passing a React-managed `<video ref={...} />` to the player causes removeChild errors (the player mutates the DOM). Or container/ref not in DOM yet when init runs.
+- ✅ **Use imperative video element only**: Create the video with `document.createElement('video')`, append to a container ref, pass that element to `videoPlayer(el, ...)`. Check `containerRef.current?.isConnected` before init. In cleanup: dispose, then `if (el.parentNode) el.parentNode.removeChild(el)`. See PATTERNS → Cloudinary Video Player (The Player).
+
+### Video player: failed HEAD or CORS-like console noise
+- Failed HEAD/analytics from the player does **not** necessarily mean playback fails. Do not add a preflight GET. If video doesn't play, use the imperative pattern and fall back to AdvancedVideo when init fails.
+
+### Video player blocked by CSP or extensions
+- **Do not** relax CSP in index.html or ask the user to disable extensions. **Fall back to AdvancedVideo** with the same publicId when the player fails to initialize.
 
 ### User needs secure/signed uploads
 - ❌ Problem: User asks for secure uploads; unsigned preset or client-side secret is not acceptable.
@@ -707,14 +714,11 @@ res.json({ signature, timestamp: paramsToSign.timestamp, api_key: process.env.CL
   4. If you need styled video player, use `cloudinary-video-player` instead
 
 ### "Video player not working" or "Player not initializing"
-- ❌ Problem: Configuration or initialization issue with standalone player
-- ✅ Solution:
-  1. Check `cloud_name` is provided in player config
-  2. Ensure CSS file is imported: `import 'cloudinary-video-player/cld-video-player.min.css'` (no `dist/` in path)
-  3. Verify player is initialized in `useEffect` with proper cleanup
-  4. Check video element has required classes: `cld-video-player cld-fluid`
-  5. Always call `player.dispose()` in useEffect cleanup function
-  6. For advanced features, ensure required modules are imported
+- ✅ **Use imperative video element only** (see PATTERNS → Cloudinary Video Player): createElement, append to container ref, pass to videoPlayer; cleanup: dispose then `if (el.parentNode) el.parentNode.removeChild(el)`. If init still fails (CSP, extensions), **fall back to AdvancedVideo** with the same publicId. Do not relax CSP or ask the user to disable extensions.
+
+### Cloudinary package install fails or "version doesn't exist"
+- ❌ Problem: Agent pinned a Cloudinary package to a specific version (e.g. `cloudinary-video-player@1.2.3`) that doesn't exist on npm, or used a wrong package name.
+- ✅ **Install latest**: Use `npm install <package>` with **no version** so npm gets the latest compatible. In package.json use a **caret** (e.g. `"cloudinary-video-player": "^1.0.0"`). Use only correct package names: `@cloudinary/react`, `@cloudinary/url-gen`, `cloudinary-video-player`, `cloudinary`. See PATTERNS → "Installing Cloudinary packages".
 
 ### Confusion between AdvancedVideo and Video Player
 - **AdvancedVideo** = for **displaying** a video (not a full player). **Cloudinary Video Player** = the **player** (styled UI, controls, playlists, etc.).
@@ -736,8 +740,7 @@ res.json({ signature, timestamp: paramsToSign.timestamp, api_key: process.env.CL
   ```
 
 ### Video player: "source is not a function" or video not playing
-- ❌ Problem: Using `player.source(publicId)` with a string.
-- ✅ **player.source()** takes an **object**: `player.source({ publicId: 'samples/elephants' })`. Use named import: `import { videoPlayer } from 'cloudinary-video-player'` (not default `import cloudinary`). Use refs for the DOM element, not `document.getElementById`. See PATTERNS → Cloudinary Video Player (The Player).
+- **player.source()** takes an **object**: `player.source({ publicId: 'samples/elephants' })`, not a string. Use named import: `import { videoPlayer } from 'cloudinary-video-player'`. See PATTERNS → Cloudinary Video Player (The Player).
 
 ### Overlay: "Cannot read properties of undefined" or overlay not showing
 - ❌ Problem: Wrong overlay API usage (Overlay.source, compass constants, .transformation().resize, fontWeight on wrong object).
@@ -813,16 +816,14 @@ When something isn't working, check:
 - [ ] Plugins are in array format
 - [ ] Upload widget script is loaded in `index.html`
 - [ ] **"createUploadWidget is not a function"?** → Wait until `typeof window.cloudinary?.createUploadWidget === 'function'` before calling it (script loads async; poll or use script onload)
-- [ ] **Video player "Invalid target for null#on"?** → Wait for ref/DOM before calling videoPlayer (e.g. setTimeout 0 or 50ms, or useLayoutEffect); clean up timeout in useEffect cleanup
+- [ ] **Video player?** → **Imperative element only**: createElement('video'), append to container ref, pass to videoPlayer(el, ...); player.source({ publicId }); cleanup: dispose then if (el.parentNode) el.parentNode.removeChild(el). CSS: cloudinary-video-player/cld-video-player.min.css. If init fails, fall back to AdvancedVideo (do not relax CSP).
 - [ ] **Upload fails (unsigned)?** → Is `VITE_CLOUDINARY_UPLOAD_PRESET` set? Preset exists and is Unsigned in dashboard?
 - [ ] **Secure uploads?** → Use `uploadSignature` as function (not `signatureEndpoint`); fetch `api_key` from server first; include `uploadPreset` in widget config; server includes `upload_preset` in signed params; use Cloudinary Node SDK v2 on server; never expose or commit API secret
 - [ ] **Where do API key/secret go?** → **Do not** put in root `.env`. Use **`server/.env`**; add to `.gitignore`; load only in server. **Never commit** API key or secret
 - [ ] Upload preset is unsigned (for simple client uploads)
-- [ ] **Video player?** → Use named import `videoPlayer` from `cloudinary-video-player`; `player.source({ publicId })` (object, not string); use refs; dispose in cleanup with try-catch; CSS: `cloudinary-video-player/cld-video-player.min.css`
+- [ ] **Installing Cloudinary packages?** → Install latest: use `npm install <package>` with no version; in package.json use caret (^) so npm gets latest compatible; do not pin to exact versions
 - [ ] **Image overlays?** → Import `source` (not Overlay.source); `compass('south_east')` (strings with underscores); `new Transformation()` inside `.transformation()`; fontWeight on TextStyle, textColor on text source
 - [ ] **Image gallery?** → Use responsive/lazyload/placeholder plugins; use sample list (samples/cloudinary-icon, samples/bike, samples/landscapes/beach-boat, samples/food/spices, etc.); assume samples might not exist; use onError; prefer uploaded assets
-- [ ] Video player is disposed in cleanup (with try-catch)
-- [ ] CSS files are imported for video player
 - [ ] TypeScript types are properly imported
 - [ ] Upload result types are defined (not using `any`)
 - [ ] Environment variables are typed in `vite-env.d.ts`
