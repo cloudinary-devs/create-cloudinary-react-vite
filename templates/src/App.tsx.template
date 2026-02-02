@@ -33,7 +33,7 @@ function App() {
   return (
     <div className="app">
       <main className="main-content">
-        <h1>Cloudinary React + Vite Boilerplate</h1>
+        <h1>Cloudinary React + Vite</h1>
         <p>This is a ready-to-use development environment with Cloudinary integration.</p>
         
         <div className="upload-section">
