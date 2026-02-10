@@ -72,7 +72,6 @@ function App() {
           <ul className="prompts-list">
             {hasUploadPreset ? (
               <>
-                <li>Upload an image to my account</li>
                 <li>Create an image gallery with lazy loading and responsive images</li>
                 <li>Create a video player that plays a Cloudinary video</li>
                 <li>Add image overlays with text or logos</li>
