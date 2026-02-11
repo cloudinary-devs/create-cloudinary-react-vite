@@ -79,7 +79,7 @@ function App() {
             ) : (
               <>
                 <li>Let&apos;s try uploading — help me add an upload preset and upload widget</li>
-                <li>Create an image gallery with lazy loading and responsive</li>
+                <li>Create an image gallery with lazy loading and responsive images</li>
                 <li>Create a video player that plays a Cloudinary video</li>
                 <li>Add image overlays with text or logos</li>
               </>
