@@ -1,3 +1,12 @@
+# [1.0.0-beta.16](https://github.com/cloudinary-devs/create-cloudinary-react/compare/v1.0.0-beta.15...v1.0.0-beta.16) (2026-02-11)
+
+
+### Bug Fixes
+
+* add copy on click ([a4ecf5d](https://github.com/cloudinary-devs/create-cloudinary-react/commit/a4ecf5d1d1478d854683a115735fa71f7fb50cea))
+* complete the sentance ([d6c68dd](https://github.com/cloudinary-devs/create-cloudinary-react/commit/d6c68ddc213fbc18771f26840f33edb805950799))
+* remove upload question ([fbf01ae](https://github.com/cloudinary-devs/create-cloudinary-react/commit/fbf01ae696e158cab48feb053a3515bb21453fdd))
+
 # [1.0.0-beta.15](https://github.com/cloudinary-devs/create-cloudinary-react/compare/v1.0.0-beta.14...v1.0.0-beta.15) (2026-02-10)
 
 
