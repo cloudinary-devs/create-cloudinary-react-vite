@@ -14,6 +14,7 @@ const hasUploadPreset = Boolean(uploadPreset);
 
 function App() {
   const [uploadedImageId, setUploadedImageId] = useState<string | null>(null);
+  const [clickedIds, setClickedIds] = useState(new Set());
 
   const handleUploadSuccess = (result: CloudinaryUploadResult) => {
     console.log('Upload successful:', result);
@@ -25,9 +26,16 @@ function App() {
     alert(`Upload failed: ${error.message}`);
   };
 
-  const copyPrompt = (e: React.MouseEvent<HTMLLIElement>) => {
+  const copyPrompt = (e: React.MouseEvent<HTMLLIElement>, id: number) => {
     const text = e.currentTarget.textContent ?? '';
-    void navigator.clipboard.writeText(text);
+    void navigator.clipboard.writeText(text).then(() => {
+      setClickedIds((prev) => new Set(prev).add(id));
+      setTimeout(() => setClickedIds( (prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      }), 2000);
+    });
   };
 
   // Display uploaded image if available, otherwise show a sample
@@ -77,16 +85,16 @@ function App() {
           <ul className="prompts-list">
             {hasUploadPreset ? (
               <>
-                <li onClick={copyPrompt} title="Click to copy">Create an image gallery with lazy loading and responsive images</li>
-                <li onClick={copyPrompt} title="Click to copy">Create a video player that plays a Cloudinary video</li>
-                <li onClick={copyPrompt} title="Click to copy">Add image overlays with text or logos</li>
+                <li key={0} onClick={(e) => copyPrompt(e, 0)} title="Click to copy" className={ clickedIds.has(0) ? "clicked" : '' }>Create an image gallery with lazy loading and responsive images</li>
+                <li key={1} onClick={(e) => copyPrompt(e, 1)} title="Click to copy" className={ clickedIds.has(1) ? "clicked" : '' }>Create a video player that plays a Cloudinary video</li>
+                <li key={2} onClick={(e) => copyPrompt(e, 2)} title="Click to copy" className={ clickedIds.has(2) ? "clicked" : '' }>Add image overlays with text or logos</li>
               </>
             ) : (
               <>
-                <li onClick={copyPrompt} title="Click to copy">Let&apos;s try uploading — help me add an upload preset and upload widget</li>
-                <li onClick={copyPrompt} title="Click to copy">Create an image gallery with lazy loading and responsive images</li>
-                <li onClick={copyPrompt} title="Click to copy">Create a video player that plays a Cloudinary video</li>
-                <li onClick={copyPrompt} title="Click to copy">Add image overlays with text or logos</li>
+                <li key={0} onClick={(e) => copyPrompt(e, 0)} title="Click to copy" className={ clickedIds.has(0) ? "clicked" : '' }>Let&apos;s try uploading — help me add an upload preset and upload widget</li>
+                <li key={1} onClick={(e) => copyPrompt(e, 1)} title="Click to copy" className={ clickedIds.has(1) ? "clicked" : '' }>Create an image gallery with lazy loading and responsive images</li>
+                <li key={2} onClick={(e) => copyPrompt(e, 2)} title="Click to copy" className={ clickedIds.has(2) ? "clicked" : '' }>Create a video player that plays a Cloudinary video</li>
+                <li key={3} onClick={(e) => copyPrompt(e, 3)} title="Click to copy" className={ clickedIds.has(3) ? "clicked" : '' }>Add image overlays with text or logos</li>
               </>
             )}
           </ul>

@@ -91,10 +91,75 @@ h2 {
   transition: all 0.2s;
   user-select: text;
   cursor: pointer;
+  position: relative;
 }
 
 .prompts-list li:hover {
   background: rgba(255, 255, 255, 0.1);
   border-left-color: rgba(99, 102, 241, 0.8);
   transform: translateX(4px);
+}
+
+@keyframes wipe-in-out {
+  0% {
+    clip-path: polygon(
+      0% 0%,
+      0% 100%, 
+      0% 100%,
+      0% 0%
+    );
+  }
+  15% {
+    clip-path: polygon(
+      0% 0%,
+      0% 100%, 
+      100% 100%,
+      100% 0%
+    );
+  }
+  85% {
+    clip-path: polygon(
+      0% 0%,
+      0% 100%, 
+      100% 100%,
+      100% 0%
+    );
+  }
+  100% {
+    clip-path: polygon(
+      100% 0%,
+      100% 100%, 
+      100% 100%,
+      100% 0%
+    );
+  }
+}
+
+.prompts-list li::after {
+  content: '✓ copied';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: green;
+  border-radius: 0.5rem;
+  visibility: hidden;
+  padding-top: 0.75em;
+  padding-left: 1em;
+  
+  /* without this it sometimes glitched at the end? */
+  clip-path: polygon(
+    0% 0%,
+    0% 100%, 
+    0% 100%,
+    0% 0%
+  );
+
+}
+
+.prompts-list li.clicked::after {
+  visibility: visible;
+  animation-duration: 1.5s;
+  animation-name: wipe-in-out;
 }
