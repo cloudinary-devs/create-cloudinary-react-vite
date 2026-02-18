@@ -1,57 +1,99 @@
 # create-cloudinary-react
 
-> **Beta Release** - This is a beta version. We welcome feedback and bug reports!
+[![npm version](https://img.shields.io/npm/v/create-cloudinary-react.svg?style=flat-square)](https://www.npmjs.com/package/create-cloudinary-react)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-Part of the [Cloudinary Developers](https://github.com/cloudinary-devs) organization.
+**The fastest way to start building with Cloudinary and React.**
 
-Scaffold a Cloudinary React + Vite + TypeScript project with interactive setup.
-
-## Prerequisites
+Scaffold a modern, production-ready Cloudinary application with React 19, Vite 6, and TypeScript 5. Features interactive setup, automatic environment configuration, and built-in AI coding assistance.
 
 - Node.js 18+ installed
 - A Cloudinary account (free tier available)
   - [Sign up for free](https://cld.media/reactregister)
   - Your cloud name is in your [dashboard](https://console.cloudinary.com/app/home/dashboard)
 
-## Usage
+> **Beta Release** - This is a beta version. We welcome feedback and bug reports!
+
+Part of the [Cloudinary Developers](https://github.com/cloudinary-devs) organization.
+
+![Build with Cloudinary!](https://res.cloudinary.com/cloudinary-creators-community/image/upload/c_thumb,w_200,g_face/v1771434800/Tee-Mascot-Hacktoberfest-cloudicorn_x6zvtf.png)
+ 
+## 📽️ Demo
+
+[![Watch the demo](https://res.cloudinary.com/drir0kpia/video/upload/so_1/reactstarterdemo.jpg)](https://res.cloudinary.com/drir0kpia/video/upload/v1771449633/reactstarterdemo.mp4)
+
+
+## 🎬 Features
+
+- **🚀 Modern Stack**: React 19 + Vite 6 + TypeScript 5.7
+- **📦 Cloudinary SDKs**: Pre-configured `@cloudinary/react`
+- **🤖 AI-First**: Auto-generates configuration for Cursor, GitHub Copilot, and Claude
+- **🛠️ Best Practices**: ESLint 9 + TypeScript-ESLint, strict type checking
+- **⚡ Interactive Setup**: Validates your cloud name and configures `.env` automatically
+- **🎨 Typed Components**: Includes a fully typed Upload Widget component
+- **🔌 MCP Support**: Built-in Model Context Protocol configuration for advanced AI integrations
+  
+## 🚀 Quick Start
+
+Ensure you have Node.js 18+ installed.
 
 ```bash
 npx create-cloudinary-react
 ```
+*(No installation required)*
 
-The CLI will prompt you for:
-- Project name
-- **Cloudinary cloud name** (found in your [dashboard](https://console.cloudinary.com/app/home/dashboard))
-- Unsigned upload preset (optional - required for uploads, but transformations work without it)
-- AI coding assistant(s) you're using (Cursor, GitHub Copilot, Claude, etc.)
-- Whether to install dependencies
-- Whether to start dev server
+The CLI will guide you through:
+1.  **Project Name**: naming your new folder
+2.  **Cloud Name**: entering your [Cloudinary cloud name](https://console.cloudinary.com/app/home/dashboard)
+3.  **Upload Preset** (Optional): handling unsigned uploads
+4.  **AI Assistant**: generating custom rules for your tool of choice (Cursor, VS Code, etc.)
 
-## Features
+## 🛠️ What's Included
 
-- ✅ Interactive setup with validation
-- ✅ Pre-configured Cloudinary React SDK
-- ✅ TypeScript + Vite + React 19
-- ✅ Typed Upload Widget component
-- ✅ Environment variables with VITE_ prefix
-- ✅ Multi-tool AI assistant support (Cursor, GitHub Copilot, Claude, and more)
-- ✅ MCP configuration for Cloudinary integration
-- ✅ ESLint + TypeScript configured
+Your new project comes with:
 
-## AI Assistant Support
+- **`src/`**: specialized for Cloudinary workflows
+- **`src/components/UploadWidget.tsx`**: A ready-to-use, typed upload component
+- **`.env`**: Pre-filled with your Cloud Name (and Upload Preset if provided)
+- **`README.md`**: Custom instructions for your specific project
+- **AI Configuration**:
+    - `.cursorrules` / `.cursor/mcp.json` (for Cursor)
+    - `.github/copilot-instructions.md` (for Copilot)
+    - `.claude` / `claude.md` (for Claude)
 
-During setup, you'll be asked which AI coding assistant(s) you're using. The CLI will generate the appropriate configuration files:
+## 🤖 AI Assistant Support
 
-- ✅ **Cursor** → `.cursorrules` + `.cursor/mcp.json` (if selected)
-- ✅ **GitHub Copilot** → `.github/copilot-instructions.md`
-- ✅ **Claude Code** → `CLAUDE.md` + `.mcp.json` (if selected)
-- ✅ **Generic AI tools** → `AI_INSTRUCTIONS.md`, `PROMPT.md`
+We believe AI is the future of development. This starter kit doesn't just give you code; it gives your AI context.
 
-**MCP Configuration**: Cursor and Claude Code use different config paths. If you select **Cursor**, the CLI writes `.cursor/mcp.json`. If you select **Claude**, it writes `.mcp.json` in the project root. Each tool only reads its own path, so both files are generated when you select both.
+During setup, select your AI tool to generate **Context Rules**. These rules teach your AI:
+- How to construct Cloudinary transformation URLs correctly
+- How to use the `@cloudinary/react` SDK components
+- Common pitfalls to avoid (like mixing up import paths)
+- How to handle upload widget events
 
-These rules help AI assistants understand Cloudinary React SDK patterns, common errors, and best practices. The generated app also includes an "AI Prompts" section with ready-to-use suggestions for your AI assistant.
+**Supported Tools:**
+- ✅ **Cursor** (Rules + MCP)
+- ✅ **GitHub Copilot** (Instructions)
+- ✅ **Claude** (Project context + MCP)
+- ✅ **Generic LLMs** (System prompts provided)
 
-## Development
+## 📋 Prerequisites
+
+- **Node.js 18+**
+- **Cloudinary Account**: [Sign up for free](https://cloudinary.com/users/register/free) if you haven't already.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1.  Fork the repository
+2.  Create your feature branch (`git checkout -b feature/amazing-feature`)
+3.  Commit your changes (`git commit -m 'feat: add some amazing feature'`)
+4.  Push to the branch (`git push origin feature/amazing-feature`)
+5.  Open a Pull Request
+
+## ⚙️ Development
 
 This project uses [Conventional Commits](https://www.conventionalcommits.org/) for version management and [semantic-release](https://github.com/semantic-release/semantic-release) for automated releases.
 
@@ -79,3 +121,6 @@ Releases are triggered manually via GitHub Actions workflow. The workflow uses n
 - `perf`: Performance improvements
 - `chore`: Other changes
 
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
