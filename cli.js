@@ -70,7 +70,7 @@ async function main() {
   } else {
   
     console.log(chalk.cyan.bold('\n🚀 Cloudinary React + Vite\n'));
-    console.log(chalk.gray('💡 Need a Cloudinary account? Sign up for free: https://cloudinary.com/users/register/free\n'));
+    console.log(chalk.gray('💡 Need a Cloudinary account? Sign up for free: https://cld.media/reactregister\n'));
   
     const questions = [
       {
@@ -101,7 +101,7 @@ async function main() {
           if (!input.trim()) {
             return chalk.yellow(
               'Cloud name is required.\n' +
-              ' → Sign up: https://cloudinary.com/users/register/free\n' +
+              ' → Sign up: https://cld.media/reactregister\n' +
               ' → Find your cloud name: https://console.cloudinary.com/app/home/dashboard'
             );
           }

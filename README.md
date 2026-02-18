@@ -10,7 +10,7 @@ Scaffold a Cloudinary React + Vite + TypeScript project with interactive setup.
 
 - Node.js 18+ installed
 - A Cloudinary account (free tier available)
-  - [Sign up for free](https://cloudinary.com/users/register/free)
+  - [Sign up for free](https://cld.media/reactregister)
   - Your cloud name is in your [dashboard](https://console.cloudinary.com/app/home/dashboard)
 
 ## Usage
