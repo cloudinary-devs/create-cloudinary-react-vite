@@ -1,3 +1,10 @@
+# [1.0.0-beta.20](https://github.com/cloudinary-devs/create-cloudinary-react/compare/v1.0.0-beta.19...v1.0.0-beta.20) (2026-02-23)
+
+
+### Bug Fixes
+
+* Merge pull request [#9](https://github.com/cloudinary-devs/create-cloudinary-react/issues/9) from jlooper-cloudinary/main ([9696686](https://github.com/cloudinary-devs/create-cloudinary-react/commit/96966864d65168b0210a8200f26c9d0d144b6fa9))
+
 # [1.0.0-beta.19](https://github.com/cloudinary-devs/create-cloudinary-react/compare/v1.0.0-beta.18...v1.0.0-beta.19) (2026-02-18)
 
 
