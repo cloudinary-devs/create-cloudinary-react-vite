@@ -69,7 +69,7 @@ async function main() {
     
   } else {
   
-    console.log(chalk.cyan.bold('\n🚀 Cloudinary React + Vite\n'));
+    console.log(chalk.cyan.bold('\n🚀 Cloudinary React Starter Kit\n'));
     console.log(chalk.gray('💡 Need a Cloudinary account? Sign up for free: https://cld.media/reactregister\n'));
   
     const questions = [
